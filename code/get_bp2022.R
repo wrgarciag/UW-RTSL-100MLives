@@ -1,16 +1,12 @@
-###########################################
+#...........................................
 #Code to get gamma distribution attributes for 
 #coutnry-age-sex-specific SBP
-###########################################
-rm(list=ls()) 
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-pacman::p_load(data.table, dplyr, tidyr, ggplot2, readxl)   
-############################################
+#...........................................
 
 ## BP distributions for every country ##
-SBP <-bind_rows(read.csv("NCD-RisC_Lancet_2017_Men_Agespecific_Mean_SBP_by_Country.csv",
+SBP <-bind_rows(read.csv(paste0(wd_raw,"NCD-RisC_Lancet_2017_Men_Agespecific_Mean_SBP_by_Country.csv"),
                          stringsAsFactors = F)%>%mutate(sex="Male"),
-                read.csv("NCD-RisC_Lancet_2017_Women_Agespecific_Mean_SBP_by_Country.csv",
+                read.csv(paste0(wd_raw,"NCD-RisC_Lancet_2017_Women_Agespecific_Mean_SBP_by_Country.csv"),
                          stringsAsFactors = F)%>%mutate(sex="Female"))%>%
   filter(Year == max(Year), Age.group!="18-19")%>%
   rename(Mean = Mean.systolic.blood.pressure..mmHg.,
@@ -18,7 +14,7 @@ SBP <-bind_rows(read.csv("NCD-RisC_Lancet_2017_Men_Agespecific_Mean_SBP_by_Count
          Upper95 = Upper.95..uncertainty.interval..mmHg.)
 
 #Updating to GBD names
-locs<-read.csv("../Country_groupings_extended.csv", stringsAsFactors = F)
+locs<-read.csv("Country_groupings_extended.csv", stringsAsFactors = F)
 
 SBP<-left_join(locs%>%
                  select(location_ncdrisc, iso3, gbd2019, location_gbd)%>%
@@ -33,8 +29,8 @@ any(is.na(SBP))
 SBP<-na.omit(SBP)
 
 #add proportion of population with raised blood pressure
-raisedBP<-bind_rows(read.csv("fem_raisedBP.csv", stringsAsFactors = F)%>%mutate(sex="Female"),
-                    read.csv("male_raisedBP.csv", stringsAsFactors = F)%>%mutate(sex="Male"))%>%
+raisedBP<-bind_rows(read.csv(paste0(wd_raw,"fem_raisedBP.csv"), stringsAsFactors = F)%>%mutate(sex="Female"),
+                    read.csv(paste0(wd_raw,"male_raisedBP.csv"), stringsAsFactors = F)%>%mutate(sex="Male"))%>%
   filter(Year==max(Year), Age.group!="18-19")%>%
   rename(raisedBP = Raised.blood.pressure.prevalence)%>%
   select(Country, raisedBP, Age.group, sex)
@@ -102,7 +98,7 @@ ggplot(plot, aes(x=age, y=stdev, color=Source))+
   xlab("Age")+
   theme_bw()
 
-ggsave("BP_stdevs_gamma.png", height = 8, width=12)
+#ggsave("BP_stdevs_gamma.png", height = 8, width=12)
 
 #################try normal distribution
 prior1<-0
@@ -192,16 +188,16 @@ ggplot(SBP, aes(x = raisedBP, y=htn4))+
 
 ggsave("htn_compare.png", height = 10, width=12)
 
-###############
+#...............
 #calculate ICC
-###############
+#...............
 library(irr)
 test<-SBP%>%ungroup()%>%select(htn4, raisedBP)
 icc(test, model = 'twoway', type = 'agreement', unit='single')
 
-###
+#...............
 #more plots
-###
+#...............
 
 ggplot(SBP%>%mutate(Age = ifelse(age<50, "Under 50", "50 plus")), aes(x = raisedBP, y=htn4))+
   geom_point()+
