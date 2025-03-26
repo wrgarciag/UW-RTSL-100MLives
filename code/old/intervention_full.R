@@ -1,7 +1,7 @@
 rm(list=ls()) 
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 #setwd("../data_preprocessing")
-setwd(paste0("C:/Users/wrgar/OneDrive - UW/02Work/ResolveToSaveLives/GitHub/UW-RTSL-100MLives/"))
+setwd(paste0("C:/Users/wrgar/OneDrive - UW/02Work/ResolveToSaveLives/100MLives/UW-RTSL-100MLives/UW-RTSL-100MLives/"))
 
 #libraries
 library(dplyr)
@@ -10,10 +10,10 @@ library(tidyr)
 library(ggplot2)
 library(RColorBrewer)
 
-wd <- "C:/Users/wrgar/OneDrive - UW/02Work/ResolveToSaveLives/GitHub/UW-RTSL-100MLives/"
+wd <- "C:/Users/wrgar/OneDrive - UW/02Work/ResolveToSaveLives/100MLives/UW-RTSL-100MLives/UW-RTSL-100MLives/"
 
 wd_code <- paste0(wd,"code/")
-wd_inpu <- paste0(wd,"input/")
+wd_data <- paste0(wd,"data/")
 wd_outp <- paste0(wd,"output/")
 
 #...........................................................
@@ -384,7 +384,7 @@ project.all <- function(Country, saltmet, salteff, saltyear2, drugcov){
 
 #test that it doesn't crash before running for ~15 mins
 #this takes ~15 seconds
-test<-project.all("Colombia",  "percent", 0.3, 2024, "p75")
+test<-project.all("United States",  "percent", 0.3, 2024, "p75")
 p<-test%>%group_by(year, intervention)%>%
   summarise(dead = sum(dead),
             sick=sum(sick))
