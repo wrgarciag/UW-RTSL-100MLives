@@ -1,0 +1,54 @@
+digraph state_transition_model {
+  rankdir=TB; // Top-to-bottom layout
+  
+  // Interventions cluster
+  subgraph cluster_interventions {
+    label="Interventions";
+    style=dashed;
+    HCP  [label="Hypertension\nControl Program", shape=box, style=filled, fillcolor=lightblue];
+    SR   [label="Sodium Reduction", shape=box, style=filled, fillcolor=lightblue];
+    LS   [label="Lipids/\nStatins", shape=box, style=filled, fillcolor=lightblue];
+    TFR  [label="Trans Fat\nReduction", shape=box, style=filled, fillcolor=lightblue];
+  }
+  
+  // Risk Factor cluster
+  subgraph cluster_risk {
+    label="Risk Factors";
+    style=dashed;
+    BP   [label="Blood Pressure", shape=ellipse, style=filled, fillcolor=lightyellow];
+    CHOL [label="Cholesterol", shape=ellipse, style=filled, fillcolor=lightyellow];
+  }
+  
+  // Health States
+  Healthy [label="Healthy", shape=box, style=filled, fillcolor=white];
+  IHD     [label="Ischemic\nHeart Disease", shape=box, style=filled, fillcolor=lightgreen];
+  IS      [label="Ischemic\nStroke", shape=box, style=filled, fillcolor=lightgreen];
+  HS      [label="Hemorrhagic\nStroke", shape=box, style=filled, fillcolor=lightgreen];
+  HHD     [label="Hypertensive\nHeart Disease", shape=box, style=filled, fillcolor=lightgreen];
+  DEM     [label="Dementia", shape=box, style=filled, fillcolor=lightgreen];
+  Dead    [label="Death", shape=box, style=filled, fillcolor=gray];
+  
+  // Arrows: Interventions affecting Risk Factors
+  HCP -> BP;
+  SR  -> BP;
+  LS  -> CHOL;
+  TFR -> CHOL;
+  
+  // Transitions from Healthy to disease states (transition probabilities are modified by relative risks)
+  Healthy -> IHD  [label="RR_{IHD}(BP,CHOL)"];
+  Healthy -> IS   [label="RR_{IS}(BP,CHOL)"];
+  Healthy -> HS   [label="RR_{HS}(BP)"];
+  Healthy -> HHD  [label="RR_{HHD}(BP)"];
+  Healthy -> DEM  [label="RR_{DEM}(BP,IS)"];
+  Healthy -> Dead [label="RR_{all-cause}"];
+  
+  // Transitions from disease states to Death
+  IHD  -> Dead [label="mortality"];
+  IS   -> Dead [label="mortality"];
+  HS   -> Dead [label="mortality"];
+  HHD  -> Dead [label="mortality"];
+  DEM  -> Dead [label="mortality"];
+  
+  // Additional transition: from Ischemic Stroke to Dementia (stroke-induced dementia)
+  IS -> DEM [label="stroke-induced"];
+}
